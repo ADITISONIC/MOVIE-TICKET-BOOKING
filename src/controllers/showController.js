@@ -1,11 +1,19 @@
 const Show = require("../models/showModel");
+const mongoose = require('mongoose')
 
 // Get all shows for a movie
 const getShows = async (req, res) => {
   const { movieId } = req.query;
 
   try {
-    const shows = await Show.find({ movieId }).populate("movieId", "title");
+    if (!mongoose.Types.ObjectId.isValid(movieId)) {
+      return res.status(400).json({ message: "Invalid Movie ID" });
+    }
+
+    const shows = await Show.find({
+      movieId: new mongoose.Types.ObjectId(movieId),
+    }).populate("movieId", "title");
+
     res.status(200).json(shows);
   } catch (error) {
     res

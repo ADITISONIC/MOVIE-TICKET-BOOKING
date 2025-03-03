@@ -6,7 +6,6 @@ const authRoutes = require("./routes/authRoutes");
 const movieRoutes = require("./routes/movieRoutes");
 const showRoutes = require("./routes/showRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
 
 // Load environment variables
 dotenv.config();
@@ -36,11 +35,12 @@ app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/movies", movieRoutes); // Movie routes
 app.use("/api/shows", showRoutes); // Show routes
 app.use("/api/bookings", bookingRoutes); // Booking routes
-app.use("/api/payments", paymentRoutes); // Payment routes
+
 
 // Default route
 app.get("/", (req, res) => {
   res.send("Movie Ticket Booking Backend is running!");
+  
 });
 
 // 404 handler

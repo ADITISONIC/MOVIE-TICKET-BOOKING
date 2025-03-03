@@ -26,6 +26,7 @@ const addMovie = async (req, res) => {
     });
 
     await newMovie.save();
+    console.log("Movie saved successfully:", newMovie);
     res.status(201).json(newMovie);
   } catch (error) {
     res

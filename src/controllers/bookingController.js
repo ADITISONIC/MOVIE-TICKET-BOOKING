@@ -51,29 +51,21 @@ const bookTicket = async (req, res) => {
   const { showId, seats, userId } = req.body;
 
   try {
-    // Check seat availability
-    await checkSeatAvailability(showId, seats);
-
-    // Lock seats
-    await lockSeats(showId, seats, userId);
-
-    // Fetch show details
+    // Fetch show details first
     const show = await Show.findById(showId);
     if (!show) {
-      await releaseSeats(showId, seats); // Release seats if show not found
-      throw new Error("Show not found");
+      return res.status(404).json({ message: "Show not found" });
     }
 
     // Check if enough seats are available
-    if (seats.length > show.seatsAvailable) {
-      await releaseSeats(showId, seats); // Release seats if not enough seats
-      throw new Error("Not enough seats available");
+    if (seats > show.seatsAvailable) {
+      return res.status(400).json({ message: "Not enough seats available" });
     }
 
-    // Calculate total price
+    // Calculate total price (implement this function separately)
     const totalPrice = calculatePrice(
       show.basePrice,
-      seats.length,
+      seats,
       show.seatsAvailable,
       show.startTime - Date.now()
     );
@@ -82,7 +74,7 @@ const bookTicket = async (req, res) => {
     const booking = new Booking({
       userId,
       showId,
-      seatsBooked: seats.length,
+      seatsBooked: seats,
       totalPrice,
       status: "pending",
     });
@@ -90,7 +82,7 @@ const bookTicket = async (req, res) => {
     await booking.save();
 
     // Update seats available in the show
-    show.seatsAvailable -= seats.length;
+    show.seatsAvailable -= seats;
     await show.save();
 
     res.status(201).json({ message: "Booking successful", booking });

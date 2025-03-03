@@ -1,9 +1,11 @@
 {
   "name": "movieticket",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +17,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.14.0",
     "mongoose": "^8.11.0",
     "node-cron": "^3.0.3",
+    "nodemon": "^3.1.9",
     "redis": "^4.7.0"
   }
 }

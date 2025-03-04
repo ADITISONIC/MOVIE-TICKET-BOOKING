@@ -4,7 +4,7 @@ const Booking = require("../models/bookingModel");
 
 // Lock seats for a specific user
 const lockSeats = async (showId, seats, userId) => {
-  const lockKey = `lock:${showId}:${seats.join(",")}`;
+  const lockKey = `lock:${showId}:${seats}`;
   const lockValue = userId;
 
   // Set a lock for 10 minutes (600 seconds)
@@ -13,18 +13,16 @@ const lockSeats = async (showId, seats, userId) => {
 
 // Release seats
 const releaseSeats = async (showId, seats) => {
-  const lockKey = `lock:${showId}:${seats.join(",")}`;
+  const lockKey = `lock:${showId}:${seats}`;
   await delAsync(lockKey);
 };
 
 // Check if seats are available
 const checkSeatAvailability = async (showId, seats) => {
-  for (const seat of seats) {
-    const lockKey = `lock:${showId}:${seat}`;
-    const lockValue = await getAsync(lockKey);
-    if (lockValue) {
-      throw new Error(`Seat ${seat} is already locked.`);
-    }
+  const lockKey = `lock:${showId}:${seats}`;
+  const lockValue = await getAsync(lockKey);
+  if (lockValue) {
+    throw new Error(`Seats are already locked.`);
   }
 };
 
@@ -62,7 +60,10 @@ const bookTicket = async (req, res) => {
       return res.status(400).json({ message: "Not enough seats available" });
     }
 
-    // Calculate total price (implement this function separately)
+    // Lock seats
+    await lockSeats(showId, seats, userId);
+
+    // Calculate total price
     const totalPrice = calculatePrice(
       show.basePrice,
       seats,
@@ -100,7 +101,10 @@ const releaseExpiredBookings = async () => {
 
   for (const booking of expiredBookings) {
     await releaseSeats(booking.showId, booking.seatsBooked);
-    await Booking.findByIdAndUpdate(booking._id, { status: "cancelled" });
+
+    if (booking.status === "pending") {
+      await Booking.findByIdAndUpdate(booking._id, { status: "cancelled" });
+    }
 
     // Restore seats available in the show
     const show = await Show.findById(booking.showId);
@@ -110,8 +114,14 @@ const releaseExpiredBookings = async () => {
     }
   }
 };
+
+// Get all bookings for a user
 const getBookings = async (req, res) => {
   const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
 
   try {
     const bookings = await Booking.find({ userId }).populate(
@@ -125,6 +135,5 @@ const getBookings = async (req, res) => {
       .json({ message: "Error fetching bookings", error: error.message });
   }
 };
-
 
 module.exports = { bookTicket, releaseExpiredBookings, getBookings };

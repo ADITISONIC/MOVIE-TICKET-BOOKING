@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { getShows } from "../api";
 import BookingForm from "./BookingForm";
 
-const ShowList = ({ match }) => {
+const ShowList = ({ movieId }) => {
   const [shows, setShows] = useState([]);
-  const movieId = match.params.movieId;
 
   useEffect(() => {
     const fetchShows = async () => {
-      const data = await getShows(movieId);
-      setShows(data);
+      const response = await getShows(movieId);
+      setShows(response.data);
     };
     fetchShows();
   }, [movieId]);
@@ -20,7 +19,8 @@ const ShowList = ({ match }) => {
       <ul>
         {shows.map((show) => (
           <li key={show._id}>
-            <h3>{show.startTime}</h3>
+            <p>Start Time: {new Date(show.startTime).toLocaleString()}</p>
+            <p>End Time: {new Date(show.endTime).toLocaleString()}</p>
             <p>Seats Available: {show.seatsAvailable}</p>
             <p>Base Price: ${show.basePrice}</p>
             <BookingForm showId={show._id} />

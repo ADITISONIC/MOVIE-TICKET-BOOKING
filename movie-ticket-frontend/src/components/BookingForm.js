@@ -5,35 +5,32 @@ const BookingForm = ({ showId }) => {
   const [seats, setSeats] = useState(1);
   const [userId, setUserId] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const response = await bookTicket(showId, seats, userId);
-    alert(`Booking successful! Total Price: $${response.totalPrice}`);
+  const handleBooking = async () => {
+    try {
+      await bookTicket(showId, seats, userId);
+      alert("Booking successful!");
+    } catch (error) {
+      alert("Booking failed: " + error.message);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Seats:
-        <input
-          type="number"
-          value={seats}
-          onChange={(e) => setSeats(e.target.value)}
-          min="1"
-          required
-        />
-      </label>
-      <label>
-        User ID:
-        <input
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
-        />
-      </label>
-      <button type="submit">Book Now</button>
-    </form>
+    <div>
+      <h2>Book Tickets</h2>
+      <input
+        type="number"
+        placeholder="Seats"
+        value={seats}
+        onChange={(e) => setSeats(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="User ID"
+        value={userId}
+        onChange={(e) => setUserId(e.target.value)}
+      />
+      <button onClick={handleBooking}>Book Now</button>
+    </div>
   );
 };
 

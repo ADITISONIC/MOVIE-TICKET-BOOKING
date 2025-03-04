@@ -1,11 +1,11 @@
 import React from "react";
-import MovieList from "../components/MovieList";
+import LoginRegister from "../components/LoginRegister";
 
 const Home = () => {
   return (
     <div>
-      <h1>Movie Ticket Booking</h1>
-      <MovieList />
+      <h1>Welcome to Movie Ticket Booking</h1>
+      <LoginRegister />
     </div>
   );
 };
